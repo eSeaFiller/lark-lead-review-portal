@@ -1,3 +1,3 @@
 window.LEAD_REVIEW_CONFIG = {
-  apiBase: "https://YOUR-PARTNER-LEAD-PORTAL.vercel.app"
+  apiBase: "https://partner-lead-portal2-fnmw.vercel.app"
 };
