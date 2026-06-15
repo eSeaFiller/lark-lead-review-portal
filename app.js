@@ -1,7 +1,4 @@
-const config = window.LEAD_REVIEW_CONFIG || {};
 const state = {
-  apiBase: (config.apiBase || "").replace(/\/$/, ""),
-  adminKey: sessionStorage.getItem("larkLeadAdminKey") || "",
   leads: [],
 };
 
@@ -9,17 +6,9 @@ const leadRows = document.querySelector("#leadRows");
 const leadSummary = document.querySelector("#leadSummary");
 const exportResult = document.querySelector("#exportResult");
 const systemNotice = document.querySelector("#systemNotice");
-const adminKeyInput = document.querySelector("#adminKey");
 
 function apiUrl(path) {
-  return `${state.apiBase}${path}`;
-}
-
-function adminHeaders() {
-  return {
-    "Content-Type": "application/json",
-    "X-Admin-Key": state.adminKey,
-  };
+  return path;
 }
 
 function escapeHtml(value) {
@@ -55,17 +44,9 @@ function warningSummary(lead) {
 async function loadLeads() {
   hideNotice();
   exportResult.classList.add("hidden");
-  if (!state.apiBase || state.apiBase.includes("YOUR-PARTNER-LEAD-PORTAL")) {
-    showNotice("Set the partner lead portal URL in config.js before deploying.");
-    return;
-  }
-  if (!state.adminKey) {
-    showNotice("Enter the admin key to load leads.");
-    return;
-  }
 
   const response = await fetch(apiUrl("/api/leads"), {
-    headers: adminHeaders(),
+    headers: { "Content-Type": "application/json" },
   });
   const payload = await response.json();
   if (!response.ok) {
@@ -119,13 +100,13 @@ function renderLeads() {
 }
 
 async function updateLead(id, status) {
-  const response = await fetch(apiUrl(`/api/leads/${id}`), {
+  const response = await fetch(apiUrl("/api/update-lead"), {
     method: "PATCH",
-    headers: adminHeaders(),
-    body: JSON.stringify({ status }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status }),
   });
   if (!response.ok) {
-    showNotice("Update failed. Check admin key and backend URL.");
+    showNotice("Update failed. Check backend environment variables.");
     return;
   }
   await loadLeads();
@@ -134,25 +115,18 @@ async function updateLead(id, status) {
 async function exportApproved() {
   exportResult.textContent = "Generating export...";
   exportResult.classList.remove("hidden");
-  const response = await fetch(apiUrl("/api/export?status=approved"), {
-    headers: adminHeaders(),
-  });
+  const response = await fetch(apiUrl("/api/export?status=approved"));
   const payload = await response.json();
   if (!response.ok) {
     exportResult.textContent = payload.error || "Export failed.";
     return;
   }
   const fileName = payload.path.split("/").pop();
-  const link = `${apiUrl(`/exports/${fileName}`)}?admin_key=${encodeURIComponent(state.adminKey)}`;
+  const link = `/api/export-file?file=${encodeURIComponent(fileName)}`;
   exportResult.innerHTML = `Exported ${payload.count} approved leads: <a href="${link}">${escapeHtml(fileName)}</a>`;
 }
 
-document.querySelector("#unlockReview").addEventListener("click", () => {
-  state.adminKey = adminKeyInput.value.trim();
-  sessionStorage.setItem("larkLeadAdminKey", state.adminKey);
-  loadLeads();
-});
-
+document.querySelector("#refreshTop").addEventListener("click", loadLeads);
 document.querySelector("#refreshLeads").addEventListener("click", loadLeads);
 document.querySelector("#statusFilter").addEventListener("change", renderLeads);
 document.querySelector("#exportApproved").addEventListener("click", exportApproved);
@@ -161,9 +135,4 @@ leadRows.addEventListener("click", (event) => {
   if (button) updateLead(button.dataset.id, button.dataset.status);
 });
 
-adminKeyInput.value = state.adminKey;
-if (state.adminKey) {
-  loadLeads();
-} else {
-  showNotice("Enter the admin key to load leads.");
-}
+loadLeads();

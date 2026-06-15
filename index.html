@@ -12,17 +12,14 @@
         <p class="eyebrow">Lark Lead Review</p>
         <h1>Partner lead review</h1>
       </div>
-      <div class="access-strip">
-        <input id="adminKey" type="password" autocomplete="current-password" placeholder="Admin key" />
-        <button id="unlockReview" class="primary" type="button">Unlock</button>
-      </div>
+      <button id="refreshTop" class="secondary" type="button">Refresh</button>
     </header>
 
     <main>
       <div class="toolbar panel">
         <div>
           <h2>Review queue</h2>
-          <p id="leadSummary" class="muted">Enter admin key to load leads.</p>
+          <p id="leadSummary" class="muted">Loading leads...</p>
         </div>
         <div class="toolbar-actions">
           <select id="statusFilter" aria-label="Filter status">
@@ -63,7 +60,6 @@
       </div>
     </main>
 
-    <script src="/config.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>

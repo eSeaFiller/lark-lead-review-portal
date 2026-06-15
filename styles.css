@@ -74,17 +74,12 @@ main {
   border-radius: 8px;
 }
 
-.access-strip,
 .toolbar-actions,
 .review-buttons {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-.access-strip input {
-  min-width: 240px;
 }
 
 input,
@@ -220,8 +215,6 @@ th {
     flex-direction: column;
   }
 
-  .access-strip input,
-  .access-strip button,
   .toolbar-actions > * {
     width: 100%;
   }
