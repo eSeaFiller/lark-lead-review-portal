@@ -1,19 +1,18 @@
+const config = window.LEAD_REVIEW_CONFIG || {};
 const state = {
-  apiBase: localStorage.getItem("larkLeadApiBase") || "",
+  apiBase: (config.apiBase || "").replace(/\/$/, ""),
   adminKey: sessionStorage.getItem("larkLeadAdminKey") || "",
   leads: [],
 };
 
-const accessForm = document.querySelector("#accessForm");
-const loginPanel = document.querySelector("#loginPanel");
-const reviewPanel = document.querySelector("#reviewPanel");
-const loginStatus = document.querySelector("#loginStatus");
 const leadRows = document.querySelector("#leadRows");
 const leadSummary = document.querySelector("#leadSummary");
 const exportResult = document.querySelector("#exportResult");
+const systemNotice = document.querySelector("#systemNotice");
+const adminKeyInput = document.querySelector("#adminKey");
 
 function apiUrl(path) {
-  return `${state.apiBase.replace(/\/$/, "")}${path}`;
+  return `${state.apiBase}${path}`;
 }
 
 function adminHeaders() {
@@ -33,6 +32,16 @@ function escapeHtml(value) {
   })[char]);
 }
 
+function showNotice(message) {
+  systemNotice.textContent = message;
+  systemNotice.classList.remove("hidden");
+}
+
+function hideNotice() {
+  systemNotice.classList.add("hidden");
+  systemNotice.textContent = "";
+}
+
 function formatDate(value) {
   if (!value) return "";
   return new Date(value).toLocaleString();
@@ -44,20 +53,26 @@ function warningSummary(lead) {
 }
 
 async function loadLeads() {
-  loginStatus.textContent = "";
+  hideNotice();
+  exportResult.classList.add("hidden");
+  if (!state.apiBase || state.apiBase.includes("YOUR-PARTNER-LEAD-PORTAL")) {
+    showNotice("Set the partner lead portal URL in config.js before deploying.");
+    return;
+  }
+  if (!state.adminKey) {
+    showNotice("Enter the admin key to load leads.");
+    return;
+  }
+
   const response = await fetch(apiUrl("/api/leads"), {
     headers: adminHeaders(),
   });
   const payload = await response.json();
   if (!response.ok) {
-    loginPanel.classList.remove("hidden");
-    reviewPanel.classList.add("hidden");
-    loginStatus.textContent = payload.error || "Unable to connect.";
+    showNotice(payload.error || "Unable to load leads.");
     return;
   }
   state.leads = payload.leads || [];
-  loginPanel.classList.add("hidden");
-  reviewPanel.classList.remove("hidden");
   renderLeads();
 }
 
@@ -65,6 +80,12 @@ function renderLeads() {
   const filter = document.querySelector("#statusFilter").value;
   const leads = state.leads.filter((lead) => filter === "all" || lead.status === filter);
   leadRows.replaceChildren();
+
+  if (!leads.length) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="9" class="empty-state">No leads match this filter.</td>`;
+    leadRows.append(tr);
+  }
 
   for (const lead of leads) {
     const fields = lead.fields || {};
@@ -104,7 +125,7 @@ async function updateLead(id, status) {
     body: JSON.stringify({ status }),
   });
   if (!response.ok) {
-    alert("Update failed. Check admin key and API URL.");
+    showNotice("Update failed. Check admin key and backend URL.");
     return;
   }
   await loadLeads();
@@ -126,25 +147,10 @@ async function exportApproved() {
   exportResult.innerHTML = `Exported ${payload.count} approved leads: <a href="${link}">${escapeHtml(fileName)}</a>`;
 }
 
-accessForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  state.apiBase = document.querySelector("#apiBase").value.trim();
-  state.adminKey = document.querySelector("#adminKey").value.trim();
-  localStorage.setItem("larkLeadApiBase", state.apiBase);
+document.querySelector("#unlockReview").addEventListener("click", () => {
+  state.adminKey = adminKeyInput.value.trim();
   sessionStorage.setItem("larkLeadAdminKey", state.adminKey);
-  loginStatus.textContent = "Connecting...";
-  await loadLeads();
-});
-
-document.querySelector("#resetAccess").addEventListener("click", () => {
-  sessionStorage.removeItem("larkLeadAdminKey");
-  localStorage.removeItem("larkLeadApiBase");
-  state.apiBase = "";
-  state.adminKey = "";
-  document.querySelector("#apiBase").value = "";
-  document.querySelector("#adminKey").value = "";
-  loginPanel.classList.remove("hidden");
-  reviewPanel.classList.add("hidden");
+  loadLeads();
 });
 
 document.querySelector("#refreshLeads").addEventListener("click", loadLeads);
@@ -155,8 +161,9 @@ leadRows.addEventListener("click", (event) => {
   if (button) updateLead(button.dataset.id, button.dataset.status);
 });
 
-document.querySelector("#apiBase").value = state.apiBase;
-document.querySelector("#adminKey").value = state.adminKey;
-if (state.apiBase && state.adminKey) {
+adminKeyInput.value = state.adminKey;
+if (state.adminKey) {
   loadLeads();
+} else {
+  showNotice("Enter the admin key to load leads.");
 }

@@ -2,7 +2,19 @@
 
 Vercel-deployable internal review UI for partner leads.
 
-This is the Lark-side page only. It connects to the same lead portal backend API used by the partner submission page.
+There is no connect/setup page. The backend URL is configured in `config.js`, and reviewers enter only the admin key in the page header.
+
+## Configure
+
+Edit `config.js` before deployment:
+
+```js
+window.LEAD_REVIEW_CONFIG = {
+  apiBase: "https://your-partner-lead-portal.vercel.app"
+};
+```
+
+Do not include `/partner` or `/admin`; use only the root domain.
 
 ## Deploy To Vercel
 
@@ -14,6 +26,7 @@ Required files:
 index.html
 styles.css
 app.js
+config.js
 vercel.json
 README.md
 ```
@@ -27,16 +40,9 @@ Output Directory: leave empty
 Install Command: leave empty
 ```
 
-## Use
+## Backend Requirements
 
-Open the deployed page and enter:
-
-```text
-Lead Portal URL: https://your-partner-lead-backend-domain
-Admin Key: your ADMIN_KEY from the backend
-```
-
-The backend must expose:
+The partner lead backend must expose:
 
 ```text
 GET /api/leads
@@ -45,4 +51,4 @@ GET /api/export?status=approved
 GET /exports/:file
 ```
 
-The backend must also allow CORS for this Vercel domain. The current `partner-lead-portal` backend supports this through `CORS_ALLOW_ORIGIN`.
+The backend must allow CORS for this Vercel domain through `CORS_ALLOW_ORIGIN`.

@@ -74,27 +74,17 @@ main {
   border-radius: 8px;
 }
 
-.login-panel {
-  display: grid;
-  gap: 14px;
-  max-width: 640px;
-  padding: 24px;
+.access-strip,
+.toolbar-actions,
+.review-buttons {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.access-form {
-  display: grid;
-  gap: 14px;
-}
-
-label {
-  display: grid;
-  gap: 7px;
-}
-
-label span {
-  color: #30394c;
-  font-size: 13px;
-  font-weight: 700;
+.access-strip input {
+  min-width: 240px;
 }
 
 input,
@@ -103,10 +93,9 @@ select {
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--ink);
-  min-height: 42px;
+  min-height: 40px;
   outline: none;
-  padding: 9px 10px;
-  width: 100%;
+  padding: 8px 10px;
 }
 
 input:focus,
@@ -119,15 +108,6 @@ select:focus {
   color: var(--muted);
   font-size: 13px;
   margin: 6px 0 0;
-}
-
-.actions,
-.toolbar-actions,
-.review-buttons {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 button {
@@ -163,9 +143,10 @@ button {
 }
 
 .notice {
+  background: #fff;
   border: 1px solid #c9d5e8;
   border-radius: 8px;
-  color: var(--success);
+  color: var(--ink);
   margin-bottom: 14px;
   padding: 12px 14px;
 }
@@ -194,6 +175,11 @@ th {
   color: #354052;
   font-size: 12px;
   text-transform: uppercase;
+}
+
+.empty-state {
+  color: var(--muted);
+  text-align: center;
 }
 
 .status {
@@ -232,5 +218,11 @@ th {
   .toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .access-strip input,
+  .access-strip button,
+  .toolbar-actions > * {
+    width: 100%;
   }
 }
