@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lark Lead Review</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Lark Lead Review</p>
+        <h1>Partner lead review</h1>
+      </div>
+      <button id="resetAccess" class="secondary" type="button">Reset access</button>
+    </header>
+
+    <main>
+      <section id="loginPanel" class="panel login-panel">
+        <h2>Connect to lead portal</h2>
+        <p class="muted">Enter the partner portal API domain and admin key.</p>
+        <form id="accessForm" class="access-form" novalidate>
+          <label for="apiBase">
+            <span>Lead Portal URL</span>
+            <input id="apiBase" name="apiBase" placeholder="https://your-partner-portal.vercel.app" required />
+          </label>
+          <label for="adminKey">
+            <span>Admin Key</span>
+            <input id="adminKey" name="adminKey" type="password" autocomplete="current-password" required />
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit">Open review</button>
+            <span id="loginStatus" role="status"></span>
+          </div>
+        </form>
+      </section>
+
+      <section id="reviewPanel" class="hidden">
+        <div class="toolbar panel">
+          <div>
+            <h2>Review queue</h2>
+            <p id="leadSummary" class="muted">No data loaded.</p>
+          </div>
+          <div class="toolbar-actions">
+            <select id="statusFilter" aria-label="Filter status">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <button id="refreshLeads" class="secondary" type="button">Refresh</button>
+            <button id="exportApproved" class="primary" type="button">Export approved Excel</button>
+          </div>
+        </div>
+
+        <div id="exportResult" class="notice hidden"></div>
+
+        <div class="table-wrap panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Partner</th>
+                <th>Lead</th>
+                <th>Company</th>
+                <th>Country</th>
+                <th>Role</th>
+                <th>Warnings</th>
+                <th>Submitted</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
