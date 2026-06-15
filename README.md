@@ -34,10 +34,11 @@ Environment variables:
 
 ```text
 LEAD_PORTAL_API_BASE=https://your-partner-lead-portal.vercel.app
-LEAD_PORTAL_ADMIN_KEY=your-partner-backend-admin-key
 ```
 
 Do not include `/partner` or `/admin` in `LEAD_PORTAL_API_BASE`; use only the root domain.
+
+`LEAD_PORTAL_ADMIN_KEY` is optional. If the partner backend has admin auth disabled, do not set it.
 
 ## Backend Requirements
 

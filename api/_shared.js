@@ -1,8 +1,8 @@
 function config() {
   const apiBase = (process.env.LEAD_PORTAL_API_BASE || "").replace(/\/$/, "");
   const adminKey = process.env.LEAD_PORTAL_ADMIN_KEY || "";
-  if (!apiBase || !adminKey) {
-    throw new Error("Missing LEAD_PORTAL_API_BASE or LEAD_PORTAL_ADMIN_KEY");
+  if (!apiBase) {
+    throw new Error("Missing LEAD_PORTAL_API_BASE");
   }
   return { apiBase, adminKey };
 }
@@ -13,7 +13,7 @@ async function proxyFetch(path, options = {}) {
     ...options,
     headers: {
       ...(options.headers || {}),
-      "X-Admin-Key": adminKey,
+      ...(adminKey ? { "X-Admin-Key": adminKey } : {}),
     },
   });
   return response;
