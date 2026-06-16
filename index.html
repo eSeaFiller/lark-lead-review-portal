@@ -22,15 +22,21 @@
           <p id="leadSummary" class="muted">Loading leads...</p>
         </div>
         <div class="toolbar-actions">
-          <select id="statusFilter" aria-label="Filter status">
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <select id="batchFilter" aria-label="Filter upload batch">
-            <option value="all">All upload batches</option>
-          </select>
+          <label class="filter-control">
+            <span>Status</span>
+            <select id="statusFilter" aria-label="Filter status">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </label>
+          <label class="filter-control batch-filter">
+            <span>Upload time / batch</span>
+            <select id="batchFilter" aria-label="Filter upload batch">
+              <option value="all">All upload batches</option>
+            </select>
+          </label>
           <button id="refreshLeads" class="secondary" type="button">Refresh</button>
           <button id="exportApproved" class="primary" type="button">Export approved batch</button>
         </div>

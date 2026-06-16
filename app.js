@@ -38,6 +38,17 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
+function formatShortDate(value) {
+  if (!value) return "Unknown time";
+  return new Date(value).toLocaleString([], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function warningSummary(lead) {
   const values = Object.values(lead.warnings || {}).filter(Boolean);
   return values.length ? values.join("; ") : "None";
@@ -48,8 +59,14 @@ function leadBatchId(lead) {
 }
 
 function leadBatchLabel(lead) {
+  const batchId = lead.uploadBatchId || "";
+  const shortBatch = batchId && batchId !== "__none__" ? batchId.slice(-6) : "";
+  const createdAt = lead.uploadBatchCreatedAt || lead.createdAt || "";
+  if (shortBatch) {
+    return `${formatShortDate(createdAt)} · ${lead.partner || "Unknown partner"} · Batch ${shortBatch}`;
+  }
   if (lead.uploadBatchLabel) return lead.uploadBatchLabel;
-  if (lead.uploadBatchCreatedAt) return `${lead.partner || "Unknown partner"} · ${formatDate(lead.uploadBatchCreatedAt)}`;
+  if (createdAt) return `${formatShortDate(createdAt)} · ${lead.partner || "Unknown partner"}`;
   return "No batch";
 }
 

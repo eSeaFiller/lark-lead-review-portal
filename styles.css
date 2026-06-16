@@ -86,6 +86,28 @@ main {
   max-width: 260px;
 }
 
+.filter-control {
+  display: grid;
+  gap: 4px;
+}
+
+.filter-control span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.filter-control select {
+  width: 180px;
+}
+
+.batch-filter select {
+  width: 320px;
+  max-width: 42vw;
+}
+
 input,
 select {
   background: #fff;
@@ -220,6 +242,12 @@ th {
   }
 
   .toolbar-actions > * {
+    max-width: none;
+    width: 100%;
+  }
+
+  .filter-control select,
+  .batch-filter select {
     max-width: none;
     width: 100%;
   }
