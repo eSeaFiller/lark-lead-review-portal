@@ -30,13 +30,19 @@ Output Directory: leave empty
 Install Command: leave empty
 ```
 
-Environment variables:
+Default partner backend:
+
+```text
+https://partner-lead-portal2-fnmw.vercel.app
+```
+
+Optional environment override:
 
 ```text
 LEAD_PORTAL_API_BASE=https://your-partner-lead-portal.vercel.app
 ```
 
-Do not include `/partner` or `/admin` in `LEAD_PORTAL_API_BASE`; use only the root domain.
+If you set `LEAD_PORTAL_API_BASE`, do not include `/partner` or `/admin`; use only the root domain.
 
 `LEAD_PORTAL_ADMIN_KEY` is optional. If the partner backend has admin auth disabled, do not set it.
 

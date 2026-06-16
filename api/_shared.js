@@ -1,9 +1,7 @@
 function config() {
-  const apiBase = (process.env.LEAD_PORTAL_API_BASE || "").replace(/\/$/, "");
+  const defaultApiBase = "https://partner-lead-portal2-fnmw.vercel.app";
+  const apiBase = (process.env.LEAD_PORTAL_API_BASE || defaultApiBase).replace(/\/$/, "");
   const adminKey = process.env.LEAD_PORTAL_ADMIN_KEY || "";
-  if (!apiBase) {
-    throw new Error("Missing LEAD_PORTAL_API_BASE");
-  }
   return { apiBase, adminKey };
 }
 
