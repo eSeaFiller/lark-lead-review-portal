@@ -28,8 +28,11 @@
             <option value="approved">Approved</option>
             <option value="rejected">Rejected</option>
           </select>
+          <select id="batchFilter" aria-label="Filter upload batch">
+            <option value="all">All upload batches</option>
+          </select>
           <button id="refreshLeads" class="secondary" type="button">Refresh</button>
-          <button id="exportApproved" class="primary" type="button">Export approved Excel</button>
+          <button id="exportApproved" class="primary" type="button">Export approved batch</button>
         </div>
       </div>
 
@@ -42,6 +45,7 @@
             <tr>
               <th>Status</th>
               <th>Partner</th>
+              <th>Batch</th>
               <th>Lead</th>
               <th>Company</th>
               <th>Country</th>
@@ -53,7 +57,7 @@
           </thead>
           <tbody id="leadRows">
             <tr>
-              <td colspan="9" class="empty-state">No leads loaded.</td>
+              <td colspan="10" class="empty-state">No leads loaded.</td>
             </tr>
           </tbody>
         </table>

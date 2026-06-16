@@ -54,6 +54,7 @@ The partner lead backend must expose:
 GET /api/leads
 PATCH /api/leads/:id
 GET /api/export?status=approved
+GET /api/export?status=approved&batchId=<upload-batch-id>
 GET /exports/:file
 ```
 

@@ -5,8 +5,11 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 405, { error: "Method not allowed" });
   }
   const status = req.query.status || "approved";
+  const batchId = req.query.batchId || "";
   try {
-    const response = await proxyFetch(`/api/export?status=${encodeURIComponent(status)}`);
+    const params = new URLSearchParams({ status });
+    if (batchId) params.set("batchId", batchId);
+    const response = await proxyFetch(`/api/export?${params.toString()}`);
     const payload = await response.json();
     return sendJson(res, response.status, payload);
   } catch (error) {

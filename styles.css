@@ -82,6 +82,10 @@ main {
   gap: 10px;
 }
 
+.toolbar-actions select {
+  max-width: 260px;
+}
+
 input,
 select {
   background: #fff;
@@ -152,7 +156,7 @@ button {
 
 table {
   border-collapse: collapse;
-  min-width: 1120px;
+  min-width: 1280px;
   width: 100%;
 }
 
@@ -216,6 +220,7 @@ th {
   }
 
   .toolbar-actions > * {
+    max-width: none;
     width: 100%;
   }
 }
