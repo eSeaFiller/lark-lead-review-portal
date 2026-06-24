@@ -95,6 +95,10 @@ function activityName(lead) {
   return lead.partner || "Unknown activity";
 }
 
+function partnerName(lead) {
+  return lead.partnerName || "Unknown partner";
+}
+
 function getActivities() {
   const activities = new Map();
   for (const lead of state.leads) {
@@ -179,7 +183,7 @@ function renderLeads() {
 
   if (!leads.length) {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="10" class="empty-state">No leads match this filter.</td>`;
+    tr.innerHTML = `<td colspan="11" class="empty-state">No leads match this filter.</td>`;
     leadRows.append(tr);
   }
 
@@ -192,13 +196,14 @@ function renderLeads() {
       const group = document.createElement("tr");
       const count = leads.filter((item) => activityName(item) === activity).length;
       group.className = "activity-group";
-      group.innerHTML = `<td colspan="10"><span>Activity</span><strong>${escapeHtml(activity)}</strong><em>${count} leads</em></td>`;
+      group.innerHTML = `<td colspan="11"><span>Activity</span><strong>${escapeHtml(activity)}</strong><em>${count} leads</em></td>`;
       leadRows.append(group);
     }
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="status ${escapeHtml(lead.status)}">${escapeHtml(lead.status)}</span></td>
       <td>${escapeHtml(activity)}</td>
+      <td>${escapeHtml(partnerName(lead))}</td>
       <td>${escapeHtml(leadBatchLabel(lead))}</td>
       <td><strong>${escapeHtml(fields.firstName)} ${escapeHtml(fields.lastName)}</strong><br>${escapeHtml(fields.workEmail)}</td>
       <td>${escapeHtml(fields.companyName)}</td>
