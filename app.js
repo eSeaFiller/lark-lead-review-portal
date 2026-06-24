@@ -7,7 +7,22 @@ const leadSummary = document.querySelector("#leadSummary");
 const exportResult = document.querySelector("#exportResult");
 const systemNotice = document.querySelector("#systemNotice");
 const statusFilter = document.querySelector("#statusFilter");
+const activityFilter = document.querySelector("#activityFilter");
 const batchFilter = document.querySelector("#batchFilter");
+
+const FIELD_LABELS = {
+  firstName: "First Name",
+  lastName: "Last Name",
+  country: "Country",
+  companyName: "Company Name",
+  mobileNumber: "Mobile Number",
+  workEmail: "Work Email",
+  jobTitle: "Job Title",
+  companySize: "Company Size",
+  industry: "Industry",
+  subIndustry: "Sub Industry",
+  trackingCode: "Tracking Code",
+};
 
 function apiUrl(path) {
   return path;
@@ -50,7 +65,13 @@ function formatShortDate(value) {
 }
 
 function warningSummary(lead) {
-  const values = Object.values(lead.warnings || {}).filter(Boolean);
+  const values = Object.entries(lead.warnings || {})
+    .filter(([, message]) => Boolean(message))
+    .map(([field, message]) => {
+      const label = FIELD_LABELS[field] || field;
+      const text = String(message);
+      return text.includes(":") ? text : `${label}: ${text}`;
+    });
   return values.length ? values.join("; ") : "None";
 }
 
@@ -63,11 +84,36 @@ function leadBatchLabel(lead) {
   const shortBatch = batchId && batchId !== "__none__" ? batchId.slice(-6) : "";
   const createdAt = lead.uploadBatchCreatedAt || lead.createdAt || "";
   if (shortBatch) {
-    return `${formatShortDate(createdAt)} · ${lead.partner || "Unknown partner"} · Batch ${shortBatch}`;
+    return `${formatShortDate(createdAt)} · ${activityName(lead)} · Batch ${shortBatch}`;
   }
   if (lead.uploadBatchLabel) return lead.uploadBatchLabel;
-  if (createdAt) return `${formatShortDate(createdAt)} · ${lead.partner || "Unknown partner"}`;
+  if (createdAt) return `${formatShortDate(createdAt)} · ${activityName(lead)}`;
   return "No batch";
+}
+
+function activityName(lead) {
+  return lead.partner || "Unknown activity";
+}
+
+function getActivities() {
+  const activities = new Map();
+  for (const lead of state.leads) {
+    const name = activityName(lead);
+    activities.set(name, (activities.get(name) || 0) + 1);
+  }
+  return [...activities.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function renderActivityFilter() {
+  const current = activityFilter.value || "all";
+  const activities = getActivities();
+  activityFilter.replaceChildren(new Option("All activities", "all"));
+  for (const activity of activities) {
+    activityFilter.append(new Option(`${activity.name} (${activity.count})`, activity.name));
+  }
+  activityFilter.value = activities.some((activity) => activity.name === current) ? current : "all";
 }
 
 function getBatches() {
@@ -110,17 +156,24 @@ async function loadLeads() {
     return;
   }
   state.leads = payload.leads || [];
+  renderActivityFilter();
   renderBatchFilter();
   renderLeads();
 }
 
 function renderLeads() {
   const status = statusFilter.value;
+  const activity = activityFilter.value;
   const batchId = batchFilter.value;
   const leads = state.leads.filter((lead) => {
     const statusMatches = status === "all" || lead.status === status;
+    const activityMatches = activity === "all" || activityName(lead) === activity;
     const batchMatches = batchId === "all" || leadBatchId(lead) === batchId;
-    return statusMatches && batchMatches;
+    return statusMatches && activityMatches && batchMatches;
+  }).sort((a, b) => {
+    const activityCompare = activityName(a).localeCompare(activityName(b));
+    if (activityCompare) return activityCompare;
+    return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
   });
   leadRows.replaceChildren();
 
@@ -130,12 +183,22 @@ function renderLeads() {
     leadRows.append(tr);
   }
 
+  let currentActivity = "";
   for (const lead of leads) {
     const fields = lead.fields || {};
+    const activity = activityName(lead);
+    if (activity !== currentActivity) {
+      currentActivity = activity;
+      const group = document.createElement("tr");
+      const count = leads.filter((item) => activityName(item) === activity).length;
+      group.className = "activity-group";
+      group.innerHTML = `<td colspan="10"><span>Activity</span><strong>${escapeHtml(activity)}</strong><em>${count} leads</em></td>`;
+      leadRows.append(group);
+    }
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="status ${escapeHtml(lead.status)}">${escapeHtml(lead.status)}</span></td>
-      <td>${escapeHtml(lead.partner)}</td>
+      <td>${escapeHtml(activity)}</td>
       <td>${escapeHtml(leadBatchLabel(lead))}</td>
       <td><strong>${escapeHtml(fields.firstName)} ${escapeHtml(fields.lastName)}</strong><br>${escapeHtml(fields.workEmail)}</td>
       <td>${escapeHtml(fields.companyName)}</td>
@@ -159,7 +222,7 @@ function renderLeads() {
     return acc;
   }, {});
   leadSummary.textContent =
-    `${state.leads.length} total · ${leads.length} shown · ${getBatches().length} batches · ${counts.pending || 0} pending · ${counts.approved || 0} approved · ${counts.rejected || 0} rejected`;
+    `${state.leads.length} total · ${leads.length} shown · ${getActivities().length} activities · ${getBatches().length} batches · ${counts.pending || 0} pending · ${counts.approved || 0} approved · ${counts.rejected || 0} rejected`;
 }
 
 async function updateLead(id, status) {
@@ -176,9 +239,24 @@ async function updateLead(id, status) {
 }
 
 async function exportApproved() {
+  if (batchFilter.value === "all") {
+    exportResult.textContent = "Choose one upload batch before exporting with a tracking code.";
+    exportResult.classList.remove("hidden");
+    return;
+  }
+
+  const trackingCode = window.prompt("Tracking code for this export batch");
+  if (trackingCode === null) return;
+  const normalizedTrackingCode = trackingCode.trim();
+  if (!normalizedTrackingCode) {
+    exportResult.textContent = "Tracking code is required for export.";
+    exportResult.classList.remove("hidden");
+    return;
+  }
+
   exportResult.textContent = "Generating export...";
   exportResult.classList.remove("hidden");
-  const params = new URLSearchParams({ status: "approved" });
+  const params = new URLSearchParams({ status: "approved", trackingCode: normalizedTrackingCode });
   if (batchFilter.value !== "all") params.set("batchId", batchFilter.value);
   const response = await fetch(apiUrl(`/api/export?${params.toString()}`));
   const payload = await response.json();
@@ -189,12 +267,13 @@ async function exportApproved() {
   const fileName = payload.path.split("/").pop();
   const link = `/api/export-file?file=${encodeURIComponent(fileName)}`;
   const batchText = batchFilter.value === "all" ? "all batches" : `batch ${escapeHtml(batchFilter.options[batchFilter.selectedIndex]?.text || batchFilter.value)}`;
-  exportResult.innerHTML = `Exported ${payload.count} approved leads from ${batchText}: <a href="${link}">${escapeHtml(fileName)}</a>`;
+  exportResult.innerHTML = `Exported ${payload.count} approved leads from ${batchText} with tracking code ${escapeHtml(normalizedTrackingCode)}: <a href="${link}">${escapeHtml(fileName)}</a>`;
 }
 
 document.querySelector("#refreshTop").addEventListener("click", loadLeads);
 document.querySelector("#refreshLeads").addEventListener("click", loadLeads);
 statusFilter.addEventListener("change", renderLeads);
+activityFilter.addEventListener("change", renderLeads);
 batchFilter.addEventListener("change", renderLeads);
 document.querySelector("#exportApproved").addEventListener("click", exportApproved);
 leadRows.addEventListener("click", (event) => {

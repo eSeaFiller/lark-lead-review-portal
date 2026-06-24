@@ -3,6 +3,7 @@
 Vercel-deployable internal review UI for partner leads.
 
 There is no connect/setup page and no visible admin-key field. Reviewers open the page and see uploaded leads.
+The review queue groups leads by Activity Name and can filter by activity, status, and upload batch.
 
 The page uses Vercel serverless proxy functions. The admin key stays in Vercel environment variables and is not exposed in browser JavaScript.
 
@@ -53,8 +54,7 @@ The partner lead backend must expose:
 ```text
 GET /api/leads
 PATCH /api/leads/:id
-GET /api/export?status=approved
-GET /api/export?status=approved&batchId=<upload-batch-id>
+GET /api/export?status=approved&batchId=<upload-batch-id>&trackingCode=<tracking-code>
 GET /exports/:file
 ```
 

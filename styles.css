@@ -1,11 +1,12 @@
 :root {
-  --bg: #f4f6fa;
-  --panel: #ffffff;
-  --ink: #18202f;
-  --muted: #687084;
-  --line: #d9dee8;
-  --primary: #246bfe;
-  --primary-hover: #1557d6;
+  --bg: #f7f1e7;
+  --panel: #fffaf1;
+  --ink: #111827;
+  --muted: #677084;
+  --line: #1f2937;
+  --fine-line: #d7ccba;
+  --primary: #174cff;
+  --primary-hover: #0f37c9;
   --danger: #b42318;
   --warning: #9a5b00;
   --success: #067647;
@@ -20,7 +21,11 @@
 }
 
 body {
-  background: var(--bg);
+  background:
+    linear-gradient(90deg, rgba(23, 76, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(23, 76, 255, 0.045) 1px, transparent 1px),
+    var(--bg);
+  background-size: 28px 28px, 28px 28px, auto;
   color: var(--ink);
   margin: 0;
 }
@@ -33,8 +38,8 @@ select {
 
 .topbar {
   align-items: end;
-  background: #fff;
-  border-bottom: 1px solid var(--line);
+  background: #fffaf1;
+  border-bottom: 2px solid var(--line);
   display: flex;
   gap: 20px;
   justify-content: space-between;
@@ -44,7 +49,7 @@ select {
 .eyebrow {
   color: var(--primary);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: 0;
   margin: 0 0 8px;
   text-transform: uppercase;
@@ -70,8 +75,9 @@ main {
 
 .panel {
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 2px solid var(--line);
   border-radius: 8px;
+  box-shadow: 5px 5px 0 rgba(17, 24, 39, 0.08);
 }
 
 .toolbar-actions,
@@ -108,10 +114,14 @@ main {
   max-width: 42vw;
 }
 
+.activity-filter select {
+  width: 240px;
+}
+
 input,
 select {
   background: #fff;
-  border: 1px solid var(--line);
+  border: 2px solid var(--fine-line);
   border-radius: 8px;
   color: var(--ink);
   min-height: 40px;
@@ -132,7 +142,7 @@ select:focus {
 }
 
 button {
-  border: 1px solid var(--line);
+  border: 2px solid var(--line);
   border-radius: 8px;
   cursor: pointer;
   min-height: 38px;
@@ -164,8 +174,8 @@ button {
 }
 
 .notice {
-  background: #fff;
-  border: 1px solid #c9d5e8;
+  background: #fffaf1;
+  border: 2px solid var(--line);
   border-radius: 8px;
   color: var(--ink);
   margin-bottom: 14px;
@@ -192,10 +202,36 @@ td {
 }
 
 th {
-  background: #f0f3f8;
-  color: #354052;
+  background: #111827;
+  color: #fffaf1;
   font-size: 12px;
   text-transform: uppercase;
+}
+
+.activity-group td {
+  background: #eef2ff;
+  border-bottom: 2px solid var(--line);
+  border-top: 2px solid var(--line);
+  color: var(--ink);
+  padding: 10px 12px;
+}
+
+.activity-group span {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 900;
+  margin-right: 10px;
+  text-transform: uppercase;
+}
+
+.activity-group strong {
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.activity-group em {
+  color: var(--muted);
+  font-style: normal;
 }
 
 .empty-state {

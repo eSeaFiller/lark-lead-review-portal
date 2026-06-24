@@ -6,9 +6,11 @@ module.exports = async function handler(req, res) {
   }
   const status = req.query.status || "approved";
   const batchId = req.query.batchId || "";
+  const trackingCode = req.query.trackingCode || "";
   try {
     const params = new URLSearchParams({ status });
     if (batchId) params.set("batchId", batchId);
+    if (trackingCode) params.set("trackingCode", trackingCode);
     const response = await proxyFetch(`/api/export?${params.toString()}`);
     const payload = await response.json();
     return sendJson(res, response.status, payload);

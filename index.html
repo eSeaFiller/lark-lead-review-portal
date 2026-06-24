@@ -10,7 +10,7 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Lark Lead Review</p>
-        <h1>Partner lead review</h1>
+        <h1>Activity lead review</h1>
       </div>
       <button id="refreshTop" class="secondary" type="button">Refresh</button>
     </header>
@@ -29,6 +29,12 @@
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
               <option value="rejected">Rejected</option>
+            </select>
+          </label>
+          <label class="filter-control activity-filter">
+            <span>Activity</span>
+            <select id="activityFilter" aria-label="Filter activity">
+              <option value="all">All activities</option>
             </select>
           </label>
           <label class="filter-control batch-filter">
@@ -50,7 +56,7 @@
           <thead>
             <tr>
               <th>Status</th>
-              <th>Partner</th>
+              <th>Activity</th>
               <th>Batch</th>
               <th>Lead</th>
               <th>Company</th>
